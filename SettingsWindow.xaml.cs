@@ -23,7 +23,8 @@ public partial class SettingsWindow : Window
             TargetLanguage = current.TargetLanguage,
             ScreenshotHotkey = current.ScreenshotHotkey,
             RecognitionHotkey = current.RecognitionHotkey,
-            TranslationHotkey = current.TranslationHotkey
+            TranslationHotkey = current.TranslationHotkey,
+            StartWithWindows = current.StartWithWindows
         };
         OcrApiKeyBox.Password = CredentialStore.Read(CredentialStore.OcrApiKey);
         OcrSecretKeyBox.Password = CredentialStore.Read(CredentialStore.OcrSecretKey);
@@ -33,6 +34,7 @@ public partial class SettingsWindow : Window
         SetHotkeyBox(ScreenshotHotkeyBox, Settings.ScreenshotHotkey);
         SetHotkeyBox(RecognitionHotkeyBox, Settings.RecognitionHotkey);
         SetHotkeyBox(TranslationHotkeyBox, Settings.TranslationHotkey);
+        StartWithWindowsCheckBox.IsChecked = Settings.StartWithWindows;
     }
 
     private bool ApplyForm()
@@ -41,6 +43,7 @@ public partial class SettingsWindow : Window
         Settings.ScreenshotHotkey = ReadHotkeyBox(ScreenshotHotkeyBox);
         Settings.RecognitionHotkey = ReadHotkeyBox(RecognitionHotkeyBox);
         Settings.TranslationHotkey = ReadHotkeyBox(TranslationHotkeyBox);
+        Settings.StartWithWindows = StartWithWindowsCheckBox.IsChecked == true;
 
         var active = new[] { Settings.ScreenshotHotkey, Settings.RecognitionHotkey, Settings.TranslationHotkey }
             .Where(value => value != "Disabled")
@@ -178,12 +181,20 @@ public partial class SettingsWindow : Window
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (!ApplyForm()) return;
-        SettingsStore.SaveSettings(Settings);
-        CredentialStore.Write(CredentialStore.OcrApiKey, OcrApiKeyBox.Password);
-        CredentialStore.Write(CredentialStore.OcrSecretKey, OcrSecretKeyBox.Password);
-        CredentialStore.Write(CredentialStore.TranslateAppId, TranslateAppIdBox.Text);
-        CredentialStore.Write(CredentialStore.TranslateSecret, TranslateSecretBox.Password);
-        DialogResult = true;
+        try
+        {
+            StartupManager.Apply(Settings.StartWithWindows);
+            SettingsStore.SaveSettings(Settings);
+            CredentialStore.Write(CredentialStore.OcrApiKey, OcrApiKeyBox.Password);
+            CredentialStore.Write(CredentialStore.OcrSecretKey, OcrSecretKeyBox.Password);
+            CredentialStore.Write(CredentialStore.TranslateAppId, TranslateAppIdBox.Text);
+            CredentialStore.Write(CredentialStore.TranslateSecret, TranslateSecretBox.Password);
+            DialogResult = true;
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(this, ex.Message, "保存设置失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;

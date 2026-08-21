@@ -71,6 +71,13 @@
                 </Grid>
                 <TextBlock Text="应用运行时全局生效" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="95,8,0,0"/>
 
+                <Border Background="#F1F3F0" CornerRadius="5" Padding="12,10" Margin="0,22,0,0">
+                    <StackPanel>
+                        <CheckBox x:Name="StartWithWindowsCheckBox" Content="登录 Windows 时静默启动" FontWeight="SemiBold"/>
+                        <TextBlock Text="启动后驻留系统托盘，不弹出主窗口；全局快捷键仍可使用。" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="24,6,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
                 <TextBlock Text="所有凭据均保存在 Windows 凭据管理器，不会写入配置文件。" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,18,0,0"/>
             </StackPanel>
         </ScrollViewer>

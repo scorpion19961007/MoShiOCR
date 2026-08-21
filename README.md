@@ -14,6 +14,7 @@
 - 长文本自动分段翻译并控制请求频率
 - API 密钥保存在 Windows 凭据管理器
 - 最近 30 条识别/翻译历史保存在本机
+- 可选择登录 Windows 时静默启动，并通过系统托盘打开或退出
 
 默认快捷键：截图 `Ctrl+Shift+A`，识别 `Ctrl+F8`，翻译 `Ctrl+F9`。三项快捷键都可在设置页直接按键录入或禁用。
 
@@ -30,7 +31,7 @@
 
 ```powershell
 dotnet build -c Release
-dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
 
-运行环境：Windows 10/11，.NET 8 Desktop Runtime。
+运行环境：Windows 10/11。GitHub Release 中的自包含版本无需预装 .NET。

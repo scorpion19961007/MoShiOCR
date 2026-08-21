@@ -189,22 +189,28 @@ public partial class MainWindow : Window
 
     private void Capture_Click(object sender, RoutedEventArgs e)
     {
-        if (!IsVisible) return;
-        Hide();
+        var wasVisible = IsVisible;
+        var captured = false;
+        if (wasVisible) Hide();
         try
         {
             var capture = new ScreenCaptureWindow();
             if (capture.ShowDialog() == true && capture.CapturedBytes is not null)
             {
+                captured = true;
                 LoadImage(capture.CapturedBytes, "image/png", "屏幕截图");
+                if (!IsVisible) Show();
                 Activate();
                 _ = RunOcrAsync();
             }
         }
         finally
         {
-            Show();
-            Activate();
+            if (wasVisible || captured)
+            {
+                if (!IsVisible) Show();
+                Activate();
+            }
         }
     }
 

@@ -9,6 +9,7 @@ public sealed class AppSettings
     public string ScreenshotHotkey { get; set; } = "Ctrl+Shift+A";
     public string RecognitionHotkey { get; set; } = "Ctrl+F8";
     public string TranslationHotkey { get; set; } = "Ctrl+F9";
+    public bool StartWithWindows { get; set; }
 }
 
 public sealed class HistoryItem
