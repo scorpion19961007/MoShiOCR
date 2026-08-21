@@ -1,0 +1,167 @@
+<Window x:Class="MoShiOCR.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="墨识 OCR" Width="1180" Height="790" MinWidth="920" MinHeight="640"
+        WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+            <Grid Margin="22,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="34" Height="34" Background="{StaticResource AccentBrush}" CornerRadius="6" Margin="0,0,11,0">
+                        <TextBlock Text="识" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel>
+                        <TextBlock Text="墨识 OCR" FontSize="17" FontWeight="Bold"/>
+                        <TextBlock Text="截图 · 识别 · 翻译" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource GhostButton}" Click="Paste_Click" Margin="0,0,8,0" ToolTip="从剪贴板粘贴图片 (Ctrl+V)">
+                        <StackPanel Orientation="Horizontal"><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77F;" Margin="0,0,7,0"/><TextBlock Text="粘贴"/></StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource GhostButton}" Click="Open_Click" Margin="0,0,8,0" ToolTip="打开本地图片">
+                        <StackPanel Orientation="Horizontal"><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8E5;" Margin="0,0,7,0"/><TextBlock Text="打开图片"/></StackPanel>
+                    </Button>
+                    <Button x:Name="CaptureButton" Style="{StaticResource PrimaryButton}" Click="Capture_Click" Margin="0,0,8,0" ToolTip="框选屏幕区域">
+                        <StackPanel Orientation="Horizontal"><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7F4;" Margin="0,0,7,0"/><TextBlock Text="截图识别"/></StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource IconButton}" Click="Settings_Click" ToolTip="API 设置" Content="&#xE713;"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="225"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="#FAFBF9" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+                <Grid Margin="16,18,14,14">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid>
+                        <TextBlock Text="最近记录" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <Button HorizontalAlignment="Right" Style="{StaticResource IconButton}" Content="&#xE74D;" ToolTip="清空历史" Click="ClearHistory_Click"/>
+                    </Grid>
+                    <ListBox x:Name="HistoryList" Grid.Row="1" Margin="0,12,0,10" BorderThickness="0" Background="Transparent" SelectionChanged="HistoryList_SelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,6"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value><ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bg" Padding="10" CornerRadius="5" Background="Transparent">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bg" Property="Background" Value="#EEF2EE"/></Trigger>
+                                            <Trigger Property="IsSelected" Value="True"><Setter TargetName="bg" Property="Background" Value="{StaticResource AccentSoftBrush}"/></Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DisplayTitle}" TextTrimming="CharacterEllipsis" FontSize="12"/>
+                                    <TextBlock Text="{Binding DisplayTime}" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock x:Name="ShortcutHint" Grid.Row="2" Text="截图  Ctrl+Shift+A" Foreground="{StaticResource MutedBrush}" FontSize="10" TextWrapping="Wrap" LineHeight="18"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" Margin="20,18,20,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="250" MinHeight="180"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6">
+                    <Grid>
+                        <Image x:Name="PreviewImage" Stretch="Uniform" Margin="12" Visibility="Collapsed"/>
+                        <StackPanel x:Name="DropHint" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border Width="52" Height="52" CornerRadius="26" Background="{StaticResource AccentSoftBrush}" HorizontalAlignment="Center">
+                                <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="拖入图片，或从剪贴板粘贴" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,13,0,4"/>
+                            <TextBlock Text="支持 PNG、JPG、WEBP、BMP" Foreground="{StaticResource MutedBrush}" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        <Border x:Name="ImageBadge" Visibility="Collapsed" Background="#DDFFFFFF" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12" Padding="8,5">
+                            <TextBlock x:Name="ImageInfo" FontSize="10"/>
+                        </Border>
+                        <Button x:Name="RemoveImageButton" Visibility="Collapsed" Style="{StaticResource IconButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12" Content="&#xE894;" ToolTip="移除图片" Click="RemoveImage_Click"/>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="13,0">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="识别文本" FontSize="13" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="SourceCount" Text="0 字" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="9,1,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE8C8;" ToolTip="复制识别文本" Click="CopySource_Click" Margin="0,0,6,0"/>
+                                        <Button x:Name="OcrButton" Style="{StaticResource PrimaryButton}" Padding="13,7" Click="Ocr_Click" Content="开始识别"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <TextBox x:Name="SourceText" Grid.Row="1" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="13" TextBlock.LineHeight="22" TextChanged="SourceText_TextChanged"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="13,0">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="翻译结果" FontSize="13" FontWeight="SemiBold"/>
+                                        <ComboBox x:Name="LanguageCombo" Width="112" Margin="10,0,0,0" SelectionChanged="LanguageCombo_SelectionChanged">
+                                            <ComboBoxItem Content="简体中文" IsSelected="True"/><ComboBoxItem Content="英语"/><ComboBoxItem Content="日语"/><ComboBoxItem Content="韩语"/><ComboBoxItem Content="法语"/><ComboBoxItem Content="德语"/><ComboBoxItem Content="西班牙语"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE8C8;" ToolTip="复制译文" Click="CopyTranslation_Click" Margin="0,0,6,0"/>
+                                        <Button x:Name="TranslateButton" Style="{StaticResource PrimaryButton}" Padding="13,7" Click="Translate_Click" Content="翻译"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <TextBox x:Name="TranslationText" Grid.Row="1" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="13" TextBlock.LineHeight="22"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+            <Grid Margin="18,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse x:Name="StatusDot" Width="7" Height="7" Fill="{StaticResource AccentBrush}" Margin="0,0,7,0"/>
+                    <TextBlock x:Name="StatusText" Text="就绪" Foreground="{StaticResource MutedBrush}" FontSize="10"/>
+                </StackPanel>
+                <TextBlock x:Name="ApiSummary" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}" FontSize="10"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
