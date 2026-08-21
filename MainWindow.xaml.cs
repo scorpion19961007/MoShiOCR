@@ -20,9 +20,6 @@ public partial class MainWindow : Window
     private const int ScreenshotHotkeyId = 0x4D4F;
     private const int RecognitionHotkeyId = 0x4D50;
     private const int TranslationHotkeyId = 0x4D51;
-    private const uint ModAlt = 0x0001;
-    private const uint ModControl = 0x0002;
-    private const uint ModShift = 0x0004;
     private const uint ModNoRepeat = 0x4000;
 
     private readonly ApiClient _api = new();
@@ -33,6 +30,7 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _operation;
     private HwndSource? _source;
     private bool _hotkeysReady = true;
+    private bool _recognitionCompleted;
 
     [DllImport("user32.dll")]
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint virtualKey);
@@ -110,7 +108,7 @@ public partial class MainWindow : Window
     private bool RegisterConfiguredHotkey(int id, string shortcut)
     {
         if (string.Equals(shortcut, "Disabled", StringComparison.OrdinalIgnoreCase)) return true;
-        if (_source is null || !TryParseHotkey(shortcut, out var modifiers, out var key)) return false;
+        if (_source is null || !HotkeyHelper.TryParse(shortcut, out var modifiers, out var key)) return false;
         return RegisterHotKey(_source.Handle, id, modifiers | ModNoRepeat, key);
     }
 
@@ -122,28 +120,6 @@ public partial class MainWindow : Window
         UnregisterHotKey(_source.Handle, TranslationHotkeyId);
     }
 
-    private static bool TryParseHotkey(string shortcut, out uint modifiers, out uint key)
-    {
-        modifiers = 0;
-        key = 0;
-        var parts = shortcut.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length < 2) return false;
-        foreach (var part in parts[..^1])
-        {
-            modifiers |= part.ToUpperInvariant() switch
-            {
-                "CTRL" => ModControl,
-                "ALT" => ModAlt,
-                "SHIFT" => ModShift,
-                _ => 0
-            };
-        }
-        var keyName = parts[^1];
-        if (Enum.TryParse<Key>(keyName, true, out var parsedKey))
-            key = (uint)KeyInterop.VirtualKeyFromKey(parsedKey);
-        return modifiers != 0 && key != 0;
-    }
-
     private void BringToFront()
     {
         if (!IsVisible) Show();
@@ -153,6 +129,12 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
+        if (e.Key == Key.Escape && _recognitionCompleted)
+        {
+            Hide();
+            e.Handled = true;
+            return;
+        }
         if (e.Key == System.Windows.Input.Key.V && System.Windows.Input.Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control))
         {
             Paste_Click(sender, e);
@@ -231,6 +213,7 @@ public partial class MainWindow : Window
     private async Task RunOcrAsync()
     {
         if (_imageBytes is null) { SetStatus("请先打开、粘贴或截取图片", true); return; }
+        _recognitionCompleted = false;
         await RunBusyAsync("正在识别图片...", async token =>
         {
             SourceText.Text = await _api.RecognizeAsync(
@@ -241,7 +224,9 @@ public partial class MainWindow : Window
                 token);
             TranslationText.Clear();
             AddHistory(SourceText.Text, "");
-            SetStatus("识别完成");
+            _recognitionCompleted = true;
+            var copied = TrySetClipboardText(SourceText.Text);
+            SetStatus(copied ? "识别完成，已复制到剪贴板" : "识别完成，但自动复制失败", !copied);
         });
     }
 
@@ -290,6 +275,7 @@ public partial class MainWindow : Window
             var normalized = NormalizeForBaidu(image, bytes, mime);
             _imageBytes = normalized.Bytes;
             _mimeType = normalized.MimeType;
+            _recognitionCompleted = false;
             PreviewImage.Source = image;
             PreviewImage.Visibility = Visibility.Visible;
             DropHint.Visibility = Visibility.Collapsed;
@@ -303,6 +289,7 @@ public partial class MainWindow : Window
     private void RemoveImage_Click(object sender, RoutedEventArgs e)
     {
         _imageBytes = null;
+        _recognitionCompleted = false;
         PreviewImage.Source = null;
         PreviewImage.Visibility = Visibility.Collapsed;
         DropHint.Visibility = Visibility.Visible;
@@ -343,8 +330,26 @@ public partial class MainWindow : Window
     private void CopyText(string text, string status)
     {
         if (string.IsNullOrEmpty(text)) { SetStatus("没有可复制的内容", true); return; }
-        Clipboard.SetText(text);
-        SetStatus(status);
+        SetStatus(TrySetClipboardText(text) ? status : "剪贴板暂时不可用，请重试", true);
+    }
+
+    private static bool TrySetClipboardText(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return false;
+        for (var attempt = 0; attempt < 4; attempt++)
+        {
+            try
+            {
+                Clipboard.SetDataObject(text, true);
+                return true;
+            }
+            catch (ExternalException)
+            {
+                if (attempt == 3) return false;
+                Thread.Sleep(40);
+            }
+        }
+        return false;
     }
 
     private void AddHistory(string source, string translation)

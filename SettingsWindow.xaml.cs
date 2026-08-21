@@ -95,9 +95,9 @@ public partial class SettingsWindow : Window
         }
 
         var modifiers = (Keyboard.Modifiers | _pendingModifiers) & (ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Shift);
-        if (modifiers == ModifierKeys.None)
+        if (modifiers == ModifierKeys.None && !HotkeyHelper.IsFunctionKey(key))
         {
-            box.Text = "组合键需包含 Ctrl、Alt 或 Shift";
+            box.Text = "单键仅支持 F1 到 F24";
             return;
         }
         if (key == Key.F4 && modifiers.HasFlag(ModifierKeys.Alt))

@@ -1,7 +1,7 @@
 <Window x:Class="MoShiOCR.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="墨识 OCR" Width="1180" Height="790" MinWidth="920" MinHeight="640"
+        Title="墨识 OCR" Icon="Assets/AppIcon.ico" Width="1180" Height="790" MinWidth="920" MinHeight="640"
         WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
     <Grid>
         <Grid.RowDefinitions>
