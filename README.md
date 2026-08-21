@@ -1,6 +1,6 @@
 # 墨识 OCR
 
-一个原生 Windows OCR 与翻译工具，使用你自己的百度 API。
+一个免费的原生 Windows OCR 与翻译工具，使用你自己的百度 API。
 
 ## 功能
 
