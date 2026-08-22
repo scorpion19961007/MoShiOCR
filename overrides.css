@@ -1,0 +1,2 @@
+h1 .hero-mainline{color:var(--ink);white-space:nowrap}
+@media (max-width:680px){h1 .hero-mainline{white-space:normal}}

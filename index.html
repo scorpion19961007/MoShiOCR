@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f4ef" />
+  <meta name="description" content="墨识 OCR 的产品详情、快捷键和使用指南。Windows 原生截图识别与翻译工具。" />
+  <title>墨识 OCR · 看见文字，马上可用</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="overrides.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="墨识 OCR 首页">
+      <img src="assets/app-icon-preview.png" alt="墨识 OCR 图标" />
+      <span>墨识 <em>OCR</em></span>
+    </a>
+    <nav class="desktop-nav" aria-label="主导航">
+      <a class="nav-link is-active" href="#overview">概览</a>
+      <a class="nav-link" href="#workflow">怎么用</a>
+      <a class="nav-link" href="#shortcuts">快捷键</a>
+      <a class="nav-link" href="#faq">常见问题</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="切换夜间模式" title="切换夜间模式"><i data-lucide="moon"></i></button>
+      <a class="header-download" href="https://github.com/scorpion19961007/MoShiOCR/releases/download/v1.3.0/MoShiOCR-v1.3.0-Windows-x64.exe">下载 v1.3.0 <i data-lucide="arrow-up-right"></i></a>
+      <button class="icon-btn menu-btn" id="menuToggle" type="button" aria-label="打开目录" aria-expanded="false"><i data-lucide="menu"></i></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" id="overview">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="status-dot"></span>Windows 原生 · 免费开源</div>
+        <h1><span class="hero-mainline">把屏幕上的文字，</span><br /><span>变成下一步。</span></h1>
+        <p class="hero-lede">墨识 OCR 是一个安静待在托盘里的截图识别工具。框选、识别、复制，三步把图片里的文字带走。</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="https://github.com/scorpion19961007/MoShiOCR/releases/download/v1.3.0/MoShiOCR-v1.3.0-Windows-x64.exe">下载 Windows 版 <i data-lucide="download"></i></a>
+          <a class="text-btn" href="https://github.com/scorpion19961007/MoShiOCR" target="_blank" rel="noreferrer">查看 GitHub <i data-lucide="arrow-up-right"></i></a>
+        </div>
+        <div class="hero-meta"><span>v1.3.0</span><span class="meta-sep"></span><span>Windows 10 / 11</span><span class="meta-sep"></span><span>自包含，无需安装 .NET</span></div>
+      </div>
+      <div class="product-stage" aria-label="墨识 OCR 应用预览">
+        <div class="stage-label">识别工作台 <span>LIVE PREVIEW</span></div>
+        <div class="app-window">
+          <div class="window-bar"><div class="window-brand"><span class="mini-mark">M</span>墨识 OCR</div><div class="window-controls"><span></span><span></span><span class="close-dot"></span></div></div>
+          <div class="window-content">
+            <div class="window-topline"><span>识别结果</span><button class="mini-action" id="copyPreview" type="button"><i data-lucide="copy"></i><span>复制</span></button></div>
+            <div class="result-box"><p>让信息流动起来，<br /><strong>而不是停在屏幕里。</strong></p><span class="result-caret"></span></div>
+            <div class="window-footer"><span><i data-lucide="check-circle-2"></i>识别完成</span><span class="mono">00:01.24</span></div>
+          </div>
+        </div>
+        <div class="stage-callout callout-copy"><i data-lucide="clipboard-check"></i><span>结果自动复制</span><b>⌘</b></div>
+        <div class="stage-callout callout-esc"><i data-lucide="keyboard"></i><span>Esc 隐藏界面</span><b>ESC</b></div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="产品亮点">
+      <div><span class="strip-number">01</span><strong>识别后自动复制</strong><span>不需要多按一步</span></div>
+      <div><span class="strip-number">02</span><strong>F1–F24 直接触发</strong><span>快捷键自己定义</span></div>
+      <div><span class="strip-number">03</span><strong>托盘常驻</strong><span>关掉窗口，不关掉工具</span></div>
+      <div><span class="strip-number">04</span><strong>夜间模式</strong><span>长时间使用更舒服</span></div>
+    </section>
+
+    <section class="section workflow-section" id="workflow">
+      <div class="section-heading"><div><p class="section-kicker">QUICK START</p><h2>从截图到文字，<br />只需要三个动作。</h2></div><p class="section-intro">不打开复杂面板，不打断当前工作。墨识 OCR 把识别藏在你已经熟悉的快捷键里。</p></div>
+      <div class="steps-grid">
+        <article class="step-card"><div class="step-index">01</div><div class="step-icon"><i data-lucide="scan-line"></i></div><h3>框选屏幕</h3><p>按下截图快捷键，拖动鼠标框出需要识别的区域。</p><span class="step-note">默认：Ctrl + Shift + A</span></article>
+        <article class="step-card featured"><div class="step-index">02</div><div class="step-icon"><i data-lucide="sparkles"></i></div><h3>自动识别</h3><p>图片会被送入百度 OCR，结果很快出现在识别窗口。</p><span class="step-note">支持 PNG · JPG · WEBP · BMP</span></article>
+        <article class="step-card"><div class="step-index">03</div><div class="step-icon"><i data-lucide="clipboard"></i></div><h3>直接粘贴</h3><p>识别成功后自动复制，回到原来的工作流继续输入。</p><span class="step-note">Esc 隐藏界面，软件继续运行</span></article>
+      </div>
+    </section>
+
+    <section class="section feature-section" id="shortcuts">
+      <div class="feature-copy"><p class="section-kicker">MADE FOR REPETITION</p><h2>把重复动作，<br /><em>交给快捷键。</em></h2><p>截图、识别、翻译三项操作都可以在设置页重新录入。F 区数字可以直接使用，不强制叠加 Ctrl、Alt 或 Shift。</p><a class="outline-btn" href="#faq">查看配置说明 <i data-lucide="arrow-down"></i></a></div>
+      <div class="shortcut-board">
+        <div class="board-header"><span>快捷键配置</span><span class="board-status"><i data-lucide="circle"></i> 已同步</span></div>
+        <div class="shortcut-row"><div><span class="row-icon blue"><i data-lucide="crop"></i></span><span>截图识别</span></div><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>A</kbd><button type="button" aria-label="编辑截图识别快捷键"><i data-lucide="pencil"></i></button></div>
+        <div class="shortcut-row active-row"><div><span class="row-icon coral"><i data-lucide="scan-text"></i></span><span>仅识别</span></div><kbd>F8</kbd><span class="custom-tag">自定义</span><button type="button" aria-label="编辑仅识别快捷键"><i data-lucide="pencil"></i></button></div>
+        <div class="shortcut-row"><div><span class="row-icon green"><i data-lucide="languages"></i></span><span>翻译结果</span></div><kbd>Ctrl</kbd><span class="plus">+</span><kbd>F9</kbd><button type="button" aria-label="编辑翻译结果快捷键"><i data-lucide="pencil"></i></button></div>
+        <div class="board-footer"><span>提示：按 Esc 可快速隐藏识别界面</span><i data-lucide="info"></i></div>
+      </div>
+    </section>
+
+    <section class="section toolkit-section">
+      <div class="section-heading"><div><p class="section-kicker">THE TOOLKIT</p><h2>小而完整，<br />刚好够用。</h2></div><p class="section-intro">把高频的小事做顺，就是效率工具存在的意义。</p></div>
+      <div class="toolkit-grid">
+        <article class="tool-item"><div class="tool-symbol dark"><i data-lucide="panel-top-close"></i></div><h3>托盘常驻</h3><p>点击关闭只会收起窗口，随时从系统托盘重新打开。</p></article>
+        <article class="tool-item"><div class="tool-symbol orange"><i data-lucide="moon"></i></div><h3>夜间模式</h3><p>主界面与设置页同步切换，夜里工作不刺眼。</p></article>
+        <article class="tool-item"><div class="tool-symbol blue"><i data-lucide="history"></i></div><h3>识别历史</h3><p>最近 30 条识别与翻译记录保存在本机，查找不丢失。</p></article>
+        <article class="tool-item"><div class="tool-symbol green"><i data-lucide="languages"></i></div><h3>文字翻译</h3><p>识别后可直接翻译为常用语言，长文本会自动分段。</p></article>
+      </div>
+    </section>
+
+    <section class="section setup-section" id="faq">
+      <div class="setup-panel"><div class="setup-copy"><p class="section-kicker">GET STARTED</p><h2>两分钟，<br />开始第一次识别。</h2><p>下载自包含版本，配置自己的百度 OCR 与翻译 API 凭据，就可以开始使用。</p><a class="primary-btn" href="https://github.com/scorpion19961007/MoShiOCR/releases/tag/v1.3.0" target="_blank" rel="noreferrer">查看安装包 <i data-lucide="arrow-up-right"></i></a></div><div class="setup-list"><div class="setup-line"><span>01</span><div><strong>下载并运行</strong><p>Windows x64 版本无需预装 .NET。</p></div></div><div class="setup-line"><span>02</span><div><strong>填入 API 凭据</strong><p>密钥保存在 Windows 凭据管理器中。</p></div></div><div class="setup-line"><span>03</span><div><strong>录入你的快捷键</strong><p>设置页支持 F1–F24 直接录入。</p></div></div></div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="brand" href="#top"><img src="assets/app-icon-preview.png" alt="" /><span>墨识 <em>OCR</em></span></a><span class="footer-note">看见文字，马上可用。</span><div class="footer-links"><a href="https://github.com/scorpion19961007/MoShiOCR" target="_blank" rel="noreferrer">GitHub <i data-lucide="arrow-up-right"></i></a><a href="#top">回到顶部 <i data-lucide="arrow-up"></i></a></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"><i data-lucide="check"></i><span>已复制到剪贴板</span></div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="script.js"></script>
+</body>
+</html>
