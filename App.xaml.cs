@@ -27,6 +27,7 @@ public partial class App : System.Windows.Application
         };
 
         var settings = SettingsStore.LoadSettings();
+        ThemeManager.Apply(settings.DarkMode);
         if (settings.StartWithWindows)
         {
             try { StartupManager.Apply(true); }

@@ -24,7 +24,8 @@ public partial class SettingsWindow : Window
             ScreenshotHotkey = current.ScreenshotHotkey,
             RecognitionHotkey = current.RecognitionHotkey,
             TranslationHotkey = current.TranslationHotkey,
-            StartWithWindows = current.StartWithWindows
+            StartWithWindows = current.StartWithWindows,
+            DarkMode = current.DarkMode
         };
         OcrApiKeyBox.Password = CredentialStore.Read(CredentialStore.OcrApiKey);
         OcrSecretKeyBox.Password = CredentialStore.Read(CredentialStore.OcrSecretKey);
@@ -35,6 +36,7 @@ public partial class SettingsWindow : Window
         SetHotkeyBox(RecognitionHotkeyBox, Settings.RecognitionHotkey);
         SetHotkeyBox(TranslationHotkeyBox, Settings.TranslationHotkey);
         StartWithWindowsCheckBox.IsChecked = Settings.StartWithWindows;
+        DarkModeCheckBox.IsChecked = Settings.DarkMode;
     }
 
     private bool ApplyForm()
@@ -44,6 +46,7 @@ public partial class SettingsWindow : Window
         Settings.RecognitionHotkey = ReadHotkeyBox(RecognitionHotkeyBox);
         Settings.TranslationHotkey = ReadHotkeyBox(TranslationHotkeyBox);
         Settings.StartWithWindows = StartWithWindowsCheckBox.IsChecked == true;
+        Settings.DarkMode = DarkModeCheckBox.IsChecked == true;
 
         var active = new[] { Settings.ScreenshotHotkey, Settings.RecognitionHotkey, Settings.TranslationHotkey }
             .Where(value => value != "Disabled")
@@ -184,6 +187,7 @@ public partial class SettingsWindow : Window
         try
         {
             StartupManager.Apply(Settings.StartWithWindows);
+            ThemeManager.Apply(Settings.DarkMode);
             SettingsStore.SaveSettings(Settings);
             CredentialStore.Write(CredentialStore.OcrApiKey, OcrApiKeyBox.Password);
             CredentialStore.Write(CredentialStore.OcrSecretKey, OcrSecretKeyBox.Password);
