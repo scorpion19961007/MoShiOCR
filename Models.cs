@@ -10,6 +10,7 @@ public sealed class AppSettings
     public string RecognitionHotkey { get; set; } = "Ctrl+F8";
     public string TranslationHotkey { get; set; } = "Ctrl+F9";
     public bool StartWithWindows { get; set; }
+    public bool DarkMode { get; set; }
 }
 
 public sealed class HistoryItem

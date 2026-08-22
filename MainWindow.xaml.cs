@@ -202,6 +202,7 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _settings = dialog.Settings;
+            ThemeManager.Apply(_settings.DarkMode);
             var hotkeysOk = _hotkeysReady = RegisterAllHotkeys();
             RefreshSettingsSummary();
             SetStatus(hotkeysOk ? "设置已保存，快捷键已生效" : "设置已保存，但部分快捷键已被其他程序占用", !hotkeysOk);
