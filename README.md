@@ -3,7 +3,7 @@
 一个免费的原生 Windows OCR 与翻译工具，使用你自己的百度 API。
 
 ## 功能
-<img width="1752" height="1176" alt="e61677e2441f393f40c248fdfd222e72" src="https://github.com/user-attachments/assets/0d56b247-6efc-4733-a0f9-cf20f9090bbf" />
+<img width="1752" height="1176" alt="e61677e2441f393f40c248fdfd222e72" src="https://github.com/user-attachments/assets/6a2e82e3-592d-41f1-aa68-56f1422a9e36" />
 
 - `Ctrl+Shift+A` 全屏框选截图并自动识别
 - 截图、识别和翻译快捷键均可自由录入；支持直接使用 `F1` 到 `F24`
@@ -30,7 +30,7 @@
 - 百度翻译开放平台通用文本翻译的 `APP ID` 和密钥
 
 应用会自动完成百度 OCR access token 获取及百度翻译 MD5 签名。
-<img width="477" height="735" alt="PixPin_2026-08-23_16-05-05" src="https://github.com/user-attachments/assets/eb6b79a7-e40f-4faf-9ff1-fb08c4a1815f" />
+<img width="477" height="735" alt="PixPin_2026-08-23_16-05-05" src="https://github.com/user-attachments/assets/399770f9-5173-4c28-97e2-23783bb29181" />
 
 ## 构建
 
