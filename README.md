@@ -1,5 +1,7 @@
 一个免费的原生 Windows OCR 与翻译工具，使用你自己的百度 API。
 
+https://scorpion19961007.github.io/MoShiOCR/
+
 ## 功能
 <img width="1752" height="1176" alt="e61677e2441f393f40c248fdfd222e72" src="https://github.com/user-attachments/assets/6a2e82e3-592d-41f1-aa68-56f1422a9e36" />
 
