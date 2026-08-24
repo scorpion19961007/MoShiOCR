@@ -1,5 +1,3 @@
-<img width="477" height="735" alt="PixPin_2026-08-23_16-05-05" src="https://github.com/user-attachments/assets/f5cf109d-616d-44d5-ad64-93afe1967fa8" /># 墨识 OCR
-
 一个免费的原生 Windows OCR 与翻译工具，使用你自己的百度 API。
 
 ## 功能
