@@ -128,6 +128,7 @@
                                 </Grid>
                             </Border>
                             <TextBox x:Name="SourceText" Grid.Row="1" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="13" TextBlock.LineHeight="22" TextChanged="SourceText_TextChanged"/>
+                            <DataGrid x:Name="TableResultGrid" Grid.Row="1" Visibility="Collapsed" AutoGenerateColumns="True" IsReadOnly="True" HeadersVisibility="None" GridLinesVisibility="All" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" Background="{DynamicResource PanelBrush}" RowBackground="{DynamicResource PanelBrush}" AlternatingRowBackground="{DynamicResource SectionBrush}" Foreground="{DynamicResource InkBrush}" BorderThickness="0" RowHeaderWidth="0" FontSize="12"/>
                         </Grid>
                     </Border>
 
