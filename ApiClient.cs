@@ -207,10 +207,21 @@ public sealed class ApiClient
                 return System.Net.WebUtility.HtmlDecode(System.Text.RegularExpressions.Regex.Replace(data, "<[^>]+>", " ")).Trim();
         }
         if (detections is TextTable[] oldCells)
-            return string.Join(Environment.NewLine, oldCells.Select(cell => cell.Text).Where(text => !string.IsNullOrWhiteSpace(text)));
+            return FormatTencentCells(oldCells
+                .Where(cell => !string.IsNullOrWhiteSpace(cell.Text))
+                .Select(cell => (Row: cell.RowTl ?? 0, Col: cell.ColTl ?? 0, Text: cell.Text)));
         if (detections is TableDetectInfo[] tables)
-            return string.Join(Environment.NewLine + Environment.NewLine, tables.Select(table => string.Join("\t", (table.Cells ?? Array.Empty<TableCell>()).Select(cell => cell.Text).Where(text => !string.IsNullOrWhiteSpace(text)))));
+            return string.Join(Environment.NewLine + Environment.NewLine, tables.Select(table => FormatTencentCells((table.Cells ?? Array.Empty<TableCell>())
+                .Where(cell => !string.IsNullOrWhiteSpace(cell.Text))
+                .Select(cell => (Row: cell.RowTl ?? 0, Col: cell.ColTl ?? 0, Text: cell.Text)))));
         return "";
+    }
+
+    private static string FormatTencentCells(IEnumerable<(long Row, long Col, string Text)> cells)
+    {
+        var rows = cells.GroupBy(cell => cell.Row).OrderBy(group => group.Key).Select(group =>
+            string.Join("\t", group.OrderBy(cell => cell.Col).Select(cell => cell.Text)));
+        return string.Join(Environment.NewLine, rows);
     }
 
     private static List<List<string>> ExtractCellRows(JsonElement table)
