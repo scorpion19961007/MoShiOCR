@@ -93,8 +93,7 @@ public partial class MainWindow : Window
                 handled = true;
                 break;
             case TableRecognitionHotkeyId:
-                BringToFront();
-                _ = RunTableOcrAsync();
+                CaptureTable_Click();
                 handled = true;
                 break;
         }
@@ -177,7 +176,11 @@ public partial class MainWindow : Window
         SetStatus("剪贴板中没有可用图片", true);
     }
 
-    private void Capture_Click(object sender, RoutedEventArgs e)
+    private void Capture_Click(object sender, RoutedEventArgs e) => CaptureAndRecognize(false);
+
+    private void CaptureTable_Click() => CaptureAndRecognize(true);
+
+    private void CaptureAndRecognize(bool table)
     {
         var wasVisible = IsVisible;
         var captured = false;
@@ -191,7 +194,7 @@ public partial class MainWindow : Window
                 LoadImage(capture.CapturedBytes, "image/png", "屏幕截图");
                 if (!IsVisible) Show();
                 Activate();
-                _ = RunOcrAsync();
+                _ = table ? RunTableOcrAsync() : RunOcrAsync();
             }
         }
         finally
