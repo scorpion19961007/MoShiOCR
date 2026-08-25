@@ -11,6 +11,7 @@ public sealed class AppSettings
     public string ScreenshotHotkey { get; set; } = "Ctrl+Shift+A";
     public string RecognitionHotkey { get; set; } = "Ctrl+F8";
     public string TranslationHotkey { get; set; } = "Ctrl+F9";
+    public string TableRecognitionHotkey { get; set; } = "Ctrl+F10";
     public bool StartWithWindows { get; set; }
     public bool DarkMode { get; set; }
 }

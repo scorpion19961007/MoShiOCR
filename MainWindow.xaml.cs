@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     private const int ScreenshotHotkeyId = 0x4D4F;
     private const int RecognitionHotkeyId = 0x4D50;
     private const int TranslationHotkeyId = 0x4D51;
+    private const int TableRecognitionHotkeyId = 0x4D52;
     private const uint ModNoRepeat = 0x4000;
 
     private readonly ApiClient _api = new();
@@ -91,6 +92,11 @@ public partial class MainWindow : Window
                 _ = RunTranslateAsync();
                 handled = true;
                 break;
+            case TableRecognitionHotkeyId:
+                BringToFront();
+                _ = RunTableOcrAsync();
+                handled = true;
+                break;
         }
         return IntPtr.Zero;
     }
@@ -102,7 +108,8 @@ public partial class MainWindow : Window
         var screenshotOk = RegisterConfiguredHotkey(ScreenshotHotkeyId, _settings.ScreenshotHotkey);
         var recognitionOk = RegisterConfiguredHotkey(RecognitionHotkeyId, _settings.RecognitionHotkey);
         var translationOk = RegisterConfiguredHotkey(TranslationHotkeyId, _settings.TranslationHotkey);
-        return screenshotOk && recognitionOk && translationOk;
+        var tableRecognitionOk = RegisterConfiguredHotkey(TableRecognitionHotkeyId, _settings.TableRecognitionHotkey);
+        return screenshotOk && recognitionOk && translationOk && tableRecognitionOk;
     }
 
     private bool RegisterConfiguredHotkey(int id, string shortcut)
@@ -118,6 +125,7 @@ public partial class MainWindow : Window
         UnregisterHotKey(_source.Handle, ScreenshotHotkeyId);
         UnregisterHotKey(_source.Handle, RecognitionHotkeyId);
         UnregisterHotKey(_source.Handle, TranslationHotkeyId);
+        UnregisterHotKey(_source.Handle, TableRecognitionHotkeyId);
     }
 
     private void BringToFront()
@@ -425,7 +433,8 @@ public partial class MainWindow : Window
         var screenshot = DisplayHotkey(_settings.ScreenshotHotkey);
         var recognition = DisplayHotkey(_settings.RecognitionHotkey);
         var translation = DisplayHotkey(_settings.TranslationHotkey);
-        ShortcutHint.Text = $"截图  {screenshot}\n识别  {recognition}\n翻译  {translation}";
+        var tableRecognition = DisplayHotkey(_settings.TableRecognitionHotkey);
+        ShortcutHint.Text = $"截图  {screenshot}\n识别  {recognition}\n表格  {tableRecognition}\n翻译  {translation}";
         CaptureButton.ToolTip = $"框选屏幕区域 ({screenshot})";
         var language = LanguageCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Content?.ToString() == _settings.TargetLanguage);
         if (language is not null) LanguageCombo.SelectedItem = language;

@@ -26,6 +26,7 @@ public partial class SettingsWindow : Window
             ScreenshotHotkey = current.ScreenshotHotkey,
             RecognitionHotkey = current.RecognitionHotkey,
             TranslationHotkey = current.TranslationHotkey,
+            TableRecognitionHotkey = current.TableRecognitionHotkey,
             StartWithWindows = current.StartWithWindows,
             DarkMode = current.DarkMode
         };
@@ -42,6 +43,7 @@ public partial class SettingsWindow : Window
         SetHotkeyBox(ScreenshotHotkeyBox, Settings.ScreenshotHotkey);
         SetHotkeyBox(RecognitionHotkeyBox, Settings.RecognitionHotkey);
         SetHotkeyBox(TranslationHotkeyBox, Settings.TranslationHotkey);
+        SetHotkeyBox(TableRecognitionHotkeyBox, Settings.TableRecognitionHotkey);
         StartWithWindowsCheckBox.IsChecked = Settings.StartWithWindows;
         DarkModeCheckBox.IsChecked = Settings.DarkMode;
     }
@@ -54,15 +56,16 @@ public partial class SettingsWindow : Window
         Settings.ScreenshotHotkey = ReadHotkeyBox(ScreenshotHotkeyBox);
         Settings.RecognitionHotkey = ReadHotkeyBox(RecognitionHotkeyBox);
         Settings.TranslationHotkey = ReadHotkeyBox(TranslationHotkeyBox);
+        Settings.TableRecognitionHotkey = ReadHotkeyBox(TableRecognitionHotkeyBox);
         Settings.StartWithWindows = StartWithWindowsCheckBox.IsChecked == true;
         Settings.DarkMode = DarkModeCheckBox.IsChecked == true;
 
-        var active = new[] { Settings.ScreenshotHotkey, Settings.RecognitionHotkey, Settings.TranslationHotkey }
+        var active = new[] { Settings.ScreenshotHotkey, Settings.RecognitionHotkey, Settings.TranslationHotkey, Settings.TableRecognitionHotkey }
             .Where(value => value != "Disabled")
             .ToArray();
         if (active.Distinct(StringComparer.OrdinalIgnoreCase).Count() != active.Length)
         {
-            System.Windows.MessageBox.Show(this, "截图、识别和翻译不能使用相同的快捷键。", "快捷键设置", MessageBoxButton.OK, MessageBoxImage.Warning);
+            System.Windows.MessageBox.Show(this, "截图、识别、表格识别和翻译不能使用相同的快捷键。", "快捷键设置", MessageBoxButton.OK, MessageBoxImage.Warning);
             return false;
         }
         return true;

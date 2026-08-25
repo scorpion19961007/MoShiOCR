@@ -162,7 +162,8 @@ public sealed class ApiClient
             return string.Join(Environment.NewLine, (response.TextDetections ?? Array.Empty<TextDetection>())
                 .Select(item => item.DetectedText).Where(text => !string.IsNullOrWhiteSpace(text)));
         }
-        var basic = await client.GeneralBasicOCR(new GeneralBasicOCRRequest { ImageBase64 = base64, LanguageType = "CHN_ENG" });
+        // Tencent uses "zh" for mixed Chinese/English; "CHN_ENG" is a Baidu-only value.
+        var basic = await client.GeneralBasicOCR(new GeneralBasicOCRRequest { ImageBase64 = base64, LanguageType = "zh" });
         token.ThrowIfCancellationRequested();
         return string.Join(Environment.NewLine, (basic.TextDetections ?? Array.Empty<TextDetection>())
             .Select(item => item.DetectedText).Where(text => !string.IsNullOrWhiteSpace(text)));

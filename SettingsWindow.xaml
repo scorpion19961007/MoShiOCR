@@ -104,13 +104,15 @@
                 </Border>
                 <Grid Margin="0,13,0,0">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="95"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <TextBlock Text="截图识别" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,9"/>
                     <TextBox x:Name="ScreenshotHotkeyBox" Grid.Column="1" Margin="0,0,0,9" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
                     <TextBlock Grid.Row="1" Text="识别图片" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,9"/>
                     <TextBox x:Name="RecognitionHotkeyBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,9" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
                     <TextBlock Grid.Row="2" Text="翻译文本" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
                     <TextBox x:Name="TranslationHotkeyBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
+                    <TextBlock Grid.Row="3" Text="表格识别" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,9,12,0"/>
+                    <TextBox x:Name="TableRecognitionHotkeyBox" Grid.Row="3" Grid.Column="1" Margin="0,9,0,0" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
                 </Grid>
                 <TextBlock Text="F1-F24 可直接使用；其他按键需搭配 Ctrl、Alt 或 Shift" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="95,8,0,0" TextWrapping="Wrap"/>
 
