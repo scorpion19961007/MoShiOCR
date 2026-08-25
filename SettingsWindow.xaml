@@ -1,12 +1,12 @@
 <Window x:Class="MoShiOCR.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="百度 API 设置" Icon="Assets/AppIcon.ico" Background="{DynamicResource CanvasBrush}" Foreground="{DynamicResource InkBrush}" Width="650" Height="720" MinWidth="590" MinHeight="560" ResizeMode="CanResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+        Title="OCR API 设置" Icon="Assets/AppIcon.ico" Background="{DynamicResource CanvasBrush}" Foreground="{DynamicResource InkBrush}" Width="650" Height="780" MinWidth="590" MinHeight="600" ResizeMode="CanResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
     <Grid Margin="26,22">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <StackPanel>
-            <TextBlock Text="百度 API 设置" FontSize="22" FontWeight="Bold"/>
-            <TextBlock Text="OCR 与翻译使用两套独立凭据" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,5,0,0"/>
+            <TextBlock Text="OCR API 设置" FontSize="22" FontWeight="Bold"/>
+            <TextBlock Text="选择 OCR 服务商；翻译仍使用百度翻译开放平台" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,5,0,0"/>
             <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,10" Margin="0,12,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -27,8 +27,21 @@
                 <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="5" Padding="12,9">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B0;" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="百度智能云 OCR" FontWeight="SemiBold"/>
+                        <TextBlock Text="OCR 服务商" FontWeight="SemiBold"/>
                     </StackPanel>
+                </Border>
+
+                <Grid Margin="0,13,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="服务商" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <ComboBox x:Name="OcrProviderCombo" Grid.Column="1" SelectionChanged="OcrProviderCombo_SelectionChanged">
+                        <ComboBoxItem Content="百度智能云 OCR" Tag="baidu"/>
+                        <ComboBoxItem Content="腾讯云 OCR" Tag="tencent"/>
+                    </ComboBox>
+                </Grid>
+
+                <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,16,0,0">
+                    <TextBlock Text="百度智能云 OCR 凭据" FontWeight="SemiBold"/>
                 </Border>
 
                 <TextBlock Text="API Key" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
@@ -45,6 +58,23 @@
                         <Button x:Name="TestOcrButton" Style="{StaticResource GhostButton}" Content="测试 OCR" Click="TestOcr_Click"/>
                 <TextBlock x:Name="OcrTestStatus" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
                     </StackPanel>
+                </Grid>
+
+                <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,18,0,0">
+                    <TextBlock Text="腾讯云 OCR 凭据" FontWeight="SemiBold"/>
+                </Border>
+                <TextBlock Text="SecretId" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
+                <TextBox x:Name="TencentSecretIdBox" Margin="0,7,0,0" Padding="10"/>
+                <TextBlock Text="SecretKey" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
+                <PasswordBox x:Name="TencentSecretKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
+                <TextBlock Text="通用识别：普通版 / 高精度版；表格识别：V1 / V2。请在上方选择服务商后使用对应凭据。" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,9,0,0" TextWrapping="Wrap"/>
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="表格识别接口" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <ComboBox x:Name="TableOcrModeCombo" Grid.Column="1" HorizontalAlignment="Left" Width="220">
+                        <ComboBoxItem Content="表格文字识别 V2" Tag="table"/>
+                        <ComboBoxItem Content="表格文字识别-提交请求" Tag="table_async"/>
+                    </ComboBox>
                 </Grid>
 
                 <Border Background="{DynamicResource WarningSoftBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">

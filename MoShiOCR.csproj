@@ -8,12 +8,15 @@
     <Nullable>enable</Nullable>
     <AssemblyName>MoShiOCR</AssemblyName>
     <RootNamespace>MoShiOCR</RootNamespace>
-    <Version>1.3.0</Version>
+    <Version>1.5.0</Version>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <AssemblyTitle>墨识 OCR</AssemblyTitle>
     <Description>支持百度 OCR 与百度翻译的 Windows 截图识别工具</Description>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\AppIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TencentCloudSDK.Ocr" Version="3.0.1495" />
   </ItemGroup>
 </Project>

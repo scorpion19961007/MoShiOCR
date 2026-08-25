@@ -123,6 +123,7 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <Button Style="{StaticResource IconButton}" Content="&#xE8C8;" ToolTip="复制识别文本" Click="CopySource_Click" Margin="0,0,6,0"/>
                                         <Button x:Name="OcrButton" Style="{StaticResource PrimaryButton}" Padding="13,7" Click="Ocr_Click" Content="开始识别"/>
+                                        <Button x:Name="TableOcrButton" Style="{StaticResource GhostButton}" Padding="11,7" Margin="7,0,0,0" Click="TableOcr_Click" Content="表格识别" ToolTip="使用百度表格 OCR"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>

@@ -19,7 +19,9 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         Settings = new AppSettings
         {
+            OcrProvider = current.OcrProvider,
             OcrMode = current.OcrMode,
+            TableOcrMode = current.TableOcrMode,
             TargetLanguage = current.TargetLanguage,
             ScreenshotHotkey = current.ScreenshotHotkey,
             RecognitionHotkey = current.RecognitionHotkey,
@@ -29,9 +31,14 @@ public partial class SettingsWindow : Window
         };
         OcrApiKeyBox.Password = CredentialStore.Read(CredentialStore.OcrApiKey);
         OcrSecretKeyBox.Password = CredentialStore.Read(CredentialStore.OcrSecretKey);
+        TencentSecretIdBox.Text = CredentialStore.Read(CredentialStore.TencentSecretId);
+        TencentSecretKeyBox.Password = CredentialStore.Read(CredentialStore.TencentSecretKey);
         TranslateAppIdBox.Text = CredentialStore.Read(CredentialStore.TranslateAppId);
         TranslateSecretBox.Password = CredentialStore.Read(CredentialStore.TranslateSecret);
         OcrModeCombo.SelectedItem = OcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.OcrMode) ?? OcrModeCombo.Items[0];
+        TableOcrModeCombo.SelectedItem = TableOcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.TableOcrMode) ?? TableOcrModeCombo.Items[0];
+        OcrProviderCombo.SelectedItem = OcrProviderCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.OcrProvider) ?? OcrProviderCombo.Items[0];
+        UpdateOcrModes();
         SetHotkeyBox(ScreenshotHotkeyBox, Settings.ScreenshotHotkey);
         SetHotkeyBox(RecognitionHotkeyBox, Settings.RecognitionHotkey);
         SetHotkeyBox(TranslationHotkeyBox, Settings.TranslationHotkey);
@@ -41,7 +48,9 @@ public partial class SettingsWindow : Window
 
     private bool ApplyForm()
     {
+        if (OcrProviderCombo.SelectedItem is ComboBoxItem provider) Settings.OcrProvider = provider.Tag?.ToString() ?? "baidu";
         if (OcrModeCombo.SelectedItem is ComboBoxItem mode) Settings.OcrMode = mode.Tag?.ToString() ?? "general_basic";
+        if (TableOcrModeCombo.SelectedItem is ComboBoxItem tableMode) Settings.TableOcrMode = tableMode.Tag?.ToString() ?? "table";
         Settings.ScreenshotHotkey = ReadHotkeyBox(ScreenshotHotkeyBox);
         Settings.RecognitionHotkey = ReadHotkeyBox(RecognitionHotkeyBox);
         Settings.TranslationHotkey = ReadHotkeyBox(TranslationHotkeyBox);
@@ -57,6 +66,34 @@ public partial class SettingsWindow : Window
             return false;
         }
         return true;
+    }
+
+    private void OcrProviderCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateOcrModes();
+
+    private void UpdateOcrModes()
+    {
+        if (OcrModeCombo is null || TableOcrModeCombo is null || OcrProviderCombo.SelectedItem is not ComboBoxItem provider) return;
+        var tencent = provider.Tag?.ToString() == "tencent";
+        var ocrMode = Settings.OcrMode;
+        var tableMode = Settings.TableOcrMode;
+        OcrModeCombo.Items.Clear();
+        TableOcrModeCombo.Items.Clear();
+        if (tencent)
+        {
+            OcrModeCombo.Items.Add(new ComboBoxItem { Content = "通用文字识别", Tag = "general_basic" });
+            OcrModeCombo.Items.Add(new ComboBoxItem { Content = "通用文字识别（高精度版）", Tag = "general_accurate" });
+            TableOcrModeCombo.Items.Add(new ComboBoxItem { Content = "表格识别（V1）", Tag = "table_v1" });
+            TableOcrModeCombo.Items.Add(new ComboBoxItem { Content = "表格识别（V2）", Tag = "table_v2" });
+        }
+        else
+        {
+            OcrModeCombo.Items.Add(new ComboBoxItem { Content = "标准版", Tag = "general_basic" });
+            OcrModeCombo.Items.Add(new ComboBoxItem { Content = "高精度版", Tag = "accurate_basic" });
+            TableOcrModeCombo.Items.Add(new ComboBoxItem { Content = "表格文字识别 V2", Tag = "table" });
+            TableOcrModeCombo.Items.Add(new ComboBoxItem { Content = "表格文字识别-提交请求", Tag = "table_async" });
+        }
+        OcrModeCombo.SelectedItem = OcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == ocrMode) ?? OcrModeCombo.Items[0];
+        TableOcrModeCombo.SelectedItem = TableOcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == tableMode) ?? TableOcrModeCombo.Items[0];
     }
 
     private void HotkeyBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -153,7 +190,8 @@ public partial class SettingsWindow : Window
         SetTestStatus(OcrTestStatus, "正在连接...", false);
         try
         {
-            await new ApiClient().TestOcrAsync(OcrApiKeyBox.Password, OcrSecretKeyBox.Password, CancellationToken.None);
+            var settings = new AppSettings { OcrProvider = ((ComboBoxItem)OcrProviderCombo.SelectedItem).Tag?.ToString() ?? "baidu" };
+            await new ApiClient().TestOcrAsync(settings, OcrApiKeyBox.Password, OcrSecretKeyBox.Password, TencentSecretIdBox.Text, TencentSecretKeyBox.Password, CancellationToken.None);
             SetTestStatus(OcrTestStatus, "连接成功", true);
         }
         catch (Exception ex)
@@ -191,6 +229,8 @@ public partial class SettingsWindow : Window
             SettingsStore.SaveSettings(Settings);
             CredentialStore.Write(CredentialStore.OcrApiKey, OcrApiKeyBox.Password);
             CredentialStore.Write(CredentialStore.OcrSecretKey, OcrSecretKeyBox.Password);
+            CredentialStore.Write(CredentialStore.TencentSecretId, TencentSecretIdBox.Text);
+            CredentialStore.Write(CredentialStore.TencentSecretKey, TencentSecretKeyBox.Password);
             CredentialStore.Write(CredentialStore.TranslateAppId, TranslateAppIdBox.Text);
             CredentialStore.Write(CredentialStore.TranslateSecret, TranslateSecretBox.Password);
             DialogResult = true;

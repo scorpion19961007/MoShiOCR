@@ -8,6 +8,8 @@ public static class CredentialStore
 {
     public const string OcrApiKey = "BaiduOcrApiKey";
     public const string OcrSecretKey = "BaiduOcrSecretKey";
+    public const string TencentSecretId = "TencentOcrSecretId";
+    public const string TencentSecretKey = "TencentOcrSecretKey";
     public const string TranslateAppId = "BaiduTranslateAppId";
     public const string TranslateSecret = "BaiduTranslateSecret";
     private const uint TypeGeneric = 1;

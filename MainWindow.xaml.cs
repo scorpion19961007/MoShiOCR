@@ -211,6 +211,8 @@ public partial class MainWindow : Window
 
     private async void Ocr_Click(object sender, RoutedEventArgs e) => await RunOcrAsync();
 
+    private async void TableOcr_Click(object sender, RoutedEventArgs e) => await RunTableOcrAsync();
+
     private async Task RunOcrAsync()
     {
         if (_imageBytes is null) { SetStatus("请先打开、粘贴或截取图片", true); return; }
@@ -222,12 +224,36 @@ public partial class MainWindow : Window
                 _settings,
                 CredentialStore.Read(CredentialStore.OcrApiKey),
                 CredentialStore.Read(CredentialStore.OcrSecretKey),
+                CredentialStore.Read(CredentialStore.TencentSecretId),
+                CredentialStore.Read(CredentialStore.TencentSecretKey),
                 token);
             TranslationText.Clear();
             AddHistory(SourceText.Text, "");
             _recognitionCompleted = true;
             var copied = TrySetClipboardText(SourceText.Text);
             SetStatus(copied ? "识别完成，已复制到剪贴板" : "识别完成，但自动复制失败", !copied);
+        });
+    }
+
+    private async Task RunTableOcrAsync()
+    {
+        if (_imageBytes is null) { SetStatus("请先打开、粘贴或截取图片", true); return; }
+        _recognitionCompleted = false;
+        await RunBusyAsync("正在识别表格...", async token =>
+        {
+            SourceText.Text = await _api.RecognizeTableAsync(
+                _imageBytes,
+                _settings,
+                CredentialStore.Read(CredentialStore.OcrApiKey),
+                CredentialStore.Read(CredentialStore.OcrSecretKey),
+                CredentialStore.Read(CredentialStore.TencentSecretId),
+                CredentialStore.Read(CredentialStore.TencentSecretKey),
+                token);
+            TranslationText.Clear();
+            AddHistory(SourceText.Text, "");
+            _recognitionCompleted = true;
+            var copied = TrySetClipboardText(SourceText.Text);
+            SetStatus(copied ? "表格识别完成，结果已复制到剪贴板" : "表格识别完成，但自动复制失败", !copied);
         });
     }
 
@@ -253,12 +279,12 @@ public partial class MainWindow : Window
     {
         _operation?.Cancel();
         _operation = new CancellationTokenSource();
-        OcrButton.IsEnabled = TranslateButton.IsEnabled = false;
+        OcrButton.IsEnabled = TableOcrButton.IsEnabled = TranslateButton.IsEnabled = false;
         SetStatus(message);
         try { await action(_operation.Token); }
         catch (OperationCanceledException) { SetStatus("操作已取消"); }
         catch (Exception ex) { SetStatus(ex.Message, true); MessageBox.Show(this, ex.Message, "请求失败", MessageBoxButton.OK, MessageBoxImage.Warning); }
-        finally { OcrButton.IsEnabled = TranslateButton.IsEnabled = true; }
+        finally { OcrButton.IsEnabled = TableOcrButton.IsEnabled = TranslateButton.IsEnabled = true; }
     }
 
     private void LoadImage(byte[] bytes, string mime, string label)
@@ -388,7 +414,14 @@ public partial class MainWindow : Window
 
     private void RefreshSettingsSummary()
     {
-        ApiSummary.Text = $"百度 OCR {(_settings.OcrMode == "accurate_basic" ? "高精度版" : "标准版")}  ·  百度翻译";
+        var provider = _settings.OcrProvider == "tencent" ? "腾讯云" : "百度";
+        var ocrMode = _settings.OcrProvider == "tencent"
+            ? (_settings.OcrMode == "general_accurate" ? "通用高精度" : "通用识别")
+            : (_settings.OcrMode == "accurate_basic" ? "高精度版" : "标准版");
+        var tableMode = _settings.OcrProvider == "tencent"
+            ? (_settings.TableOcrMode == "table_v2" ? "表格 V2" : "表格 V1")
+            : (_settings.TableOcrMode == "table_async" ? "表格提交请求" : "表格 V2");
+        ApiSummary.Text = $"{provider} OCR {ocrMode} · {tableMode} · 百度翻译";
         var screenshot = DisplayHotkey(_settings.ScreenshotHotkey);
         var recognition = DisplayHotkey(_settings.RecognitionHotkey);
         var translation = DisplayHotkey(_settings.TranslationHotkey);

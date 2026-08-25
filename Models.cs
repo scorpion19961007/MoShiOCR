@@ -4,7 +4,9 @@ namespace MoShiOCR;
 
 public sealed class AppSettings
 {
+    public string OcrProvider { get; set; } = "baidu";
     public string OcrMode { get; set; } = "general_basic";
+    public string TableOcrMode { get; set; } = "table";
     public string TargetLanguage { get; set; } = "简体中文";
     public string ScreenshotHotkey { get; set; } = "Ctrl+Shift+A";
     public string RecognitionHotkey { get; set; } = "Ctrl+F8";
