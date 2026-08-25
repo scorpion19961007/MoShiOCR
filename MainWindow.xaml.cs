@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace MoShiOCR;
 
@@ -180,11 +181,14 @@ public partial class MainWindow : Window
 
     private void CaptureTable_Click() => CaptureAndRecognize(true);
 
-    private void CaptureAndRecognize(bool table)
+    private async void CaptureAndRecognize(bool table)
     {
         var wasVisible = IsVisible;
         var captured = false;
         if (wasVisible) Hide();
+        // Let WPF and DWM finish removing the main window before copying the desktop.
+        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
+        await Task.Delay(60);
         try
         {
             var capture = new ScreenCaptureWindow();
