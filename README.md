@@ -1,6 +1,7 @@
 # 墨识 OCR
 
 一个免费的原生 Windows OCR 与翻译工具，支持自带百度云或腾讯云 API 凭据。
+<img width="876" height="588" alt="PixPin_2026-08-25_11-06-26" src="https://github.com/user-attachments/assets/0743f07e-8431-4796-a473-f199e8eec852" />
 
 ## 功能
 
@@ -31,6 +32,7 @@
 表格识别：打开或截取包含表格的图片后，点击识别文本区域右下角的“表格识别”按钮。先在设置页选择 OCR 服务商，再选择对应的表格接口；百度异步接口会自动轮询结果。
 
 ## API 凭据
+<img width="479" height="581" alt="PixPin_2026-08-25_11-05-47" src="https://github.com/user-attachments/assets/708f4962-2d05-4689-a867-8ab9185dd583" />
 
 需要准备两组凭据：
 
