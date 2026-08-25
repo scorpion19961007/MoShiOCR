@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -33,6 +34,7 @@ public partial class MainWindow : Window
     private HwndSource? _source;
     private bool _hotkeysReady = true;
     private bool _recognitionCompleted;
+    private bool _tableResultVisible;
 
     [DllImport("user32.dll")]
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint virtualKey);
@@ -234,7 +236,7 @@ public partial class MainWindow : Window
         _recognitionCompleted = false;
         await RunBusyAsync("正在识别图片...", async token =>
         {
-            SourceText.Text = await _api.RecognizeAsync(
+            var result = await _api.RecognizeAsync(
                 _imageBytes,
                 _settings,
                 CredentialStore.Read(CredentialStore.OcrApiKey),
@@ -242,10 +244,11 @@ public partial class MainWindow : Window
                 CredentialStore.Read(CredentialStore.TencentSecretId),
                 CredentialStore.Read(CredentialStore.TencentSecretKey),
                 token);
+            ShowTextResult(result);
             TranslationText.Clear();
-            AddHistory(SourceText.Text, "");
+            AddHistory(result, "");
             _recognitionCompleted = true;
-            var copied = TrySetClipboardText(SourceText.Text);
+            var copied = TrySetClipboardText(result);
             SetStatus(copied ? "识别完成，已复制到剪贴板" : "识别完成，但自动复制失败", !copied);
         });
     }
@@ -256,7 +259,7 @@ public partial class MainWindow : Window
         _recognitionCompleted = false;
         await RunBusyAsync("正在识别表格...", async token =>
         {
-            SourceText.Text = await _api.RecognizeTableAsync(
+            var result = await _api.RecognizeTableAsync(
                 _imageBytes,
                 _settings,
                 CredentialStore.Read(CredentialStore.OcrApiKey),
@@ -264,10 +267,11 @@ public partial class MainWindow : Window
                 CredentialStore.Read(CredentialStore.TencentSecretId),
                 CredentialStore.Read(CredentialStore.TencentSecretKey),
                 token);
+            ShowTableResult(result);
             TranslationText.Clear();
-            AddHistory(SourceText.Text, "");
+            AddHistory(result, "");
             _recognitionCompleted = true;
-            var copied = TrySetClipboardText(SourceText.Text);
+            var copied = TrySetClipboardTable(result);
             SetStatus(copied ? "表格识别完成，结果已复制到剪贴板" : "表格识别完成，但自动复制失败", !copied);
         });
     }
@@ -366,7 +370,16 @@ public partial class MainWindow : Window
         }
     }
 
-    private void CopySource_Click(object sender, RoutedEventArgs e) => CopyText(SourceText.Text, "识别文本已复制");
+    private void CopySource_Click(object sender, RoutedEventArgs e)
+    {
+        if (_tableResultVisible)
+        {
+            var copied = TrySetClipboardTable(SourceText.Text);
+            SetStatus(copied ? "表格已复制，可直接粘贴到 Excel 或 WPS" : "剪贴板暂时不可用，请重试", !copied);
+            return;
+        }
+        CopyText(SourceText.Text, "识别文本已复制");
+    }
     private void CopyTranslation_Click(object sender, RoutedEventArgs e) => CopyText(TranslationText.Text, "译文已复制");
 
     private void CopyText(string text, string status)
@@ -394,6 +407,74 @@ public partial class MainWindow : Window
         return false;
     }
 
+    private void ShowTextResult(string text)
+    {
+        _tableResultVisible = false;
+        TableResultGrid.Visibility = Visibility.Collapsed;
+        SourceText.Visibility = Visibility.Visible;
+        SourceText.Text = text;
+    }
+
+    private void ShowTableResult(string text)
+    {
+        _tableResultVisible = true;
+        SourceText.Text = text;
+        SourceText.Visibility = Visibility.Collapsed;
+        TableResultGrid.ItemsSource = ParseTable(text).DefaultView;
+        TableResultGrid.Visibility = Visibility.Visible;
+    }
+
+    private static DataTable ParseTable(string text)
+    {
+        var rows = text.Replace("\r\n", "\n").Replace('\r', '\n')
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Split('\t'))
+            .ToList();
+        var table = new DataTable();
+        var columnCount = Math.Max(1, rows.Count == 0 ? 1 : rows.Max(row => row.Length));
+        for (var column = 0; column < columnCount; column++) table.Columns.Add($"C{column + 1}");
+        foreach (var row in rows)
+        {
+            var dataRow = table.NewRow();
+            for (var column = 0; column < row.Length; column++) dataRow[column] = row[column];
+            table.Rows.Add(dataRow);
+        }
+        return table;
+    }
+
+    private static bool TrySetClipboardTable(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        var data = new DataObject();
+        data.SetData(DataFormats.UnicodeText, text);
+        data.SetData(DataFormats.Text, text);
+        data.SetData(DataFormats.Html, ToHtmlTable(text));
+        for (var attempt = 0; attempt < 4; attempt++)
+        {
+            try { Clipboard.SetDataObject(data, true); return true; }
+            catch (ExternalException)
+            {
+                if (attempt == 3) return false;
+                Thread.Sleep(40);
+            }
+        }
+        return false;
+    }
+
+    private static string ToHtmlTable(string text)
+    {
+        var rows = text.Replace("\r\n", "\n").Replace('\r', '\n')
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var html = new System.Text.StringBuilder("<table>");
+        foreach (var row in rows)
+        {
+            html.Append("<tr>");
+            foreach (var cell in row.Split('\t')) html.Append("<td>").Append(System.Net.WebUtility.HtmlEncode(cell)).Append("</td>");
+            html.Append("</tr>");
+        }
+        return html.Append("</table>").ToString();
+    }
+
     private void AddHistory(string source, string translation)
     {
         if (string.IsNullOrWhiteSpace(source)) return;
@@ -412,7 +493,7 @@ public partial class MainWindow : Window
     {
         if (HistoryList.SelectedItem is HistoryItem item)
         {
-            SourceText.Text = item.SourceText;
+            ShowTextResult(item.SourceText);
             TranslationText.Text = item.Translation;
         }
     }
