@@ -147,6 +147,8 @@ public partial class MainWindow : Window
         }
         if (e.Key == System.Windows.Input.Key.V && System.Windows.Input.Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control))
         {
+            // Let the source editor handle Ctrl+V as a normal text paste. Elsewhere it pastes an image.
+            if (SourceText.IsKeyboardFocusWithin) return;
             Paste_Click(sender, e);
             e.Handled = true;
         }
