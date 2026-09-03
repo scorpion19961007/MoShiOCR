@@ -1,12 +1,20 @@
 <Window x:Class="MoShiOCR.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="OCR API 设置" Icon="Assets/AppIcon.ico" Background="{DynamicResource CanvasBrush}" Foreground="{DynamicResource InkBrush}" Width="650" Height="780" MinWidth="590" MinHeight="600" ResizeMode="CanResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+        Title="OCR API 设置" Icon="Assets/AppIcon.ico"
+        Background="{DynamicResource CanvasBrush}" Foreground="{DynamicResource InkBrush}"
+        Width="650" Height="780" MinWidth="590" MinHeight="600"
+        ResizeMode="CanResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
     <Grid Margin="26,22">
-        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <StackPanel>
             <TextBlock Text="OCR API 设置" FontSize="22" FontWeight="Bold"/>
-            <TextBlock Text="选择 OCR 服务商；翻译仍使用百度翻译开放平台" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,5,0,0"/>
+            <TextBlock Text="选择 OCR 服务商，当前服务商的凭据和接口会显示在下方" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,5,0,0"/>
             <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,10" Margin="0,12,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -24,66 +32,59 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,20,0,16">
             <StackPanel>
-                <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="5" Padding="12,9">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B0;" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="OCR 服务商" FontWeight="SemiBold"/>
-                    </StackPanel>
+                <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="5" Padding="12,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="OCR 服务商" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="OcrProviderCombo" Grid.Column="1" Width="220" HorizontalAlignment="Right" SelectionChanged="OcrProviderCombo_SelectionChanged">
+                            <ComboBoxItem Content="百度智能云 OCR" Tag="baidu"/>
+                            <ComboBoxItem Content="腾讯云 OCR" Tag="tencent"/>
+                        </ComboBox>
+                    </Grid>
                 </Border>
 
-                <Grid Margin="0,13,0,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="服务商" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <ComboBox x:Name="OcrProviderCombo" Grid.Column="1" SelectionChanged="OcrProviderCombo_SelectionChanged">
-                        <ComboBoxItem Content="百度智能云 OCR" Tag="baidu"/>
-                        <ComboBoxItem Content="腾讯云 OCR" Tag="tencent"/>
-                    </ComboBox>
-                </Grid>
+                <StackPanel x:Name="BaiduOcrPanel">
+                    <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,16,0,0">
+                        <TextBlock Text="百度智能云 OCR" FontWeight="SemiBold"/>
+                    </Border>
+                    <TextBlock Text="API Key" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
+                    <PasswordBox x:Name="OcrApiKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
+                    <TextBlock Text="Secret Key" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
+                    <PasswordBox x:Name="OcrSecretKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
+                </StackPanel>
 
-                <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,16,0,0">
-                    <TextBlock Text="百度智能云 OCR 凭据" FontWeight="SemiBold"/>
-                </Border>
-
-                <TextBlock Text="API Key" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
-                <PasswordBox x:Name="OcrApiKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
-                <TextBlock Text="Secret Key" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
-                <PasswordBox x:Name="OcrSecretKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
-                <Grid Margin="0,12,0,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="识别接口" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <ComboBox x:Name="OcrModeCombo" Grid.Column="1">
-                        <ComboBoxItem Content="标准版" Tag="general_basic"/><ComboBoxItem Content="高精度版" Tag="accurate_basic"/>
-                    </ComboBox>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button x:Name="TestOcrButton" Style="{StaticResource GhostButton}" Content="测试 OCR" Click="TestOcr_Click"/>
-                <TextBlock x:Name="OcrTestStatus" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
-                    </StackPanel>
-                </Grid>
+                <StackPanel x:Name="TencentOcrPanel" Visibility="Collapsed">
+                    <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,16,0,0">
+                        <TextBlock Text="腾讯云 OCR" FontWeight="SemiBold"/>
+                    </Border>
+                    <TextBlock Text="SecretId" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
+                    <TextBox x:Name="TencentSecretIdBox" Margin="0,7,0,0" Padding="10"/>
+                    <TextBlock Text="SecretKey" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
+                    <PasswordBox x:Name="TencentSecretKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
+                    <TextBlock Text="腾讯云 OCR 使用 SecretId 和 SecretKey 鉴权。" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,9,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
 
                 <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,18,0,0">
-                    <TextBlock Text="腾讯云 OCR 凭据" FontWeight="SemiBold"/>
+                    <TextBlock Text="识别接口" FontWeight="SemiBold"/>
                 </Border>
-                <TextBlock Text="SecretId" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
-                <TextBox x:Name="TencentSecretIdBox" Margin="0,7,0,0" Padding="10"/>
-                <TextBlock Text="SecretKey" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
-                <PasswordBox x:Name="TencentSecretKeyBox" Margin="0,7,0,0" Padding="10" BorderBrush="{DynamicResource LineBrush}"/>
-                <TextBlock Text="通用识别：普通版 / 高精度版；表格识别：V1 / V2。请在上方选择服务商后使用对应凭据。" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,9,0,0" TextWrapping="Wrap"/>
                 <Grid Margin="0,12,0,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="表格识别接口" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <ComboBox x:Name="TableOcrModeCombo" Grid.Column="1" HorizontalAlignment="Left" Width="220">
-                        <ComboBoxItem Content="表格文字识别 V2" Tag="table"/>
-                        <ComboBoxItem Content="表格文字识别-提交请求" Tag="table_async"/>
-                    </ComboBox>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="普通文字识别" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <ComboBox x:Name="OcrModeCombo" Grid.Column="1"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="TestOcrButton" Style="{StaticResource GhostButton}" Content="测试 OCR" Click="TestOcr_Click"/>
+                        <TextBlock x:Name="OcrTestStatus" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="表格识别" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <ComboBox x:Name="TableOcrModeCombo" Grid.Column="1"/>
                 </Grid>
 
                 <Border Background="{DynamicResource WarningSoftBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8C1;" Foreground="{DynamicResource WarmBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="百度翻译开放平台" FontWeight="SemiBold"/>
-                    </StackPanel>
+                    <TextBlock Text="百度翻译开放平台" FontWeight="SemiBold"/>
                 </Border>
-
                 <TextBlock Text="APP ID" FontWeight="SemiBold" FontSize="12" Margin="0,14,0,0"/>
                 <TextBox x:Name="TranslateAppIdBox" Margin="0,7,0,0"/>
                 <TextBlock Text="密钥" FontWeight="SemiBold" FontSize="12" Margin="0,12,0,0"/>
@@ -97,10 +98,7 @@
                 </Grid>
 
                 <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE765;" Foreground="{DynamicResource InkBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="全局快捷键" FontWeight="SemiBold"/>
-                    </StackPanel>
+                    <TextBlock Text="全局快捷键" FontWeight="SemiBold"/>
                 </Border>
                 <Grid Margin="0,13,0,0">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="95"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -109,13 +107,12 @@
                     <TextBox x:Name="ScreenshotHotkeyBox" Grid.Column="1" Margin="0,0,0,9" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
                     <TextBlock Grid.Row="1" Text="识别图片" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,9"/>
                     <TextBox x:Name="RecognitionHotkeyBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,9" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
-                    <TextBlock Grid.Row="2" Text="翻译文本" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <TextBox x:Name="TranslationHotkeyBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
-                    <TextBlock Grid.Row="3" Text="表格识别" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,9,12,0"/>
-                    <TextBox x:Name="TableRecognitionHotkeyBox" Grid.Row="3" Grid.Column="1" Margin="0,9,0,0" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
+                    <TextBlock Grid.Row="2" Text="翻译文本" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,9"/>
+                    <TextBox x:Name="TranslationHotkeyBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,9" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
+                    <TextBlock Grid.Row="3" Text="表格识别" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBox x:Name="TableRecognitionHotkeyBox" Grid.Row="3" Grid.Column="1" IsReadOnly="True" TextAlignment="Center" Cursor="Hand" PreviewKeyDown="HotkeyBox_PreviewKeyDown" GotKeyboardFocus="HotkeyBox_GotKeyboardFocus" LostKeyboardFocus="HotkeyBox_LostKeyboardFocus" ToolTip="支持 F1-F24 单键或组合键；按 Backspace 或 Delete 可禁用"/>
                 </Grid>
                 <TextBlock Text="F1-F24 可直接使用；其他按键需搭配 Ctrl、Alt 或 Shift" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="95,8,0,0" TextWrapping="Wrap"/>
-
                 <TextBlock Text="所有凭据均保存在 Windows 凭据管理器，不会写入配置文件。" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,18,0,0"/>
             </StackPanel>
         </ScrollViewer>
