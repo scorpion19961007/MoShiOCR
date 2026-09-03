@@ -8,10 +8,10 @@
     <Nullable>enable</Nullable>
     <AssemblyName>MoShiOCR</AssemblyName>
     <RootNamespace>MoShiOCR</RootNamespace>
-    <Version>1.11.1</Version>
+    <Version>1.12.0</Version>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <AssemblyTitle>墨识 OCR</AssemblyTitle>
-    <Description>支持百度 OCR 与百度翻译的 Windows 截图识别工具</Description>
+    <Description>支持百度 OCR、腾讯云 OCR 与对应翻译服务的 Windows 截图识别工具</Description>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\AppIcon.ico" />
