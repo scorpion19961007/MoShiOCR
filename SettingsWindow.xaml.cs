@@ -79,6 +79,8 @@ public partial class SettingsWindow : Window
         var tableMode = Settings.TableOcrMode;
         BaiduOcrPanel.Visibility = tencent ? Visibility.Collapsed : Visibility.Visible;
         TencentOcrPanel.Visibility = tencent ? Visibility.Visible : Visibility.Collapsed;
+        BaiduTranslatePanel.Visibility = tencent ? Visibility.Collapsed : Visibility.Visible;
+        TencentTranslatePanel.Visibility = tencent ? Visibility.Visible : Visibility.Collapsed;
         OcrModeCombo.Items.Clear();
         TableOcrModeCombo.Items.Clear();
         if (tencent)
@@ -207,19 +209,23 @@ public partial class SettingsWindow : Window
 
     private async void TestTranslate_Click(object sender, RoutedEventArgs e)
     {
+        var tencent = OcrProviderCombo.SelectedItem is ComboBoxItem provider && provider.Tag?.ToString() == "tencent";
+        var status = tencent ? TencentTranslateTestStatus : TranslateTestStatus;
         TestTranslateButton.IsEnabled = false;
-        SetTestStatus(TranslateTestStatus, "正在连接...", false);
+        TestTencentTranslateButton.IsEnabled = false;
+        SetTestStatus(status, "正在连接...", false);
         try
         {
-            await new ApiClient().TestTranslateAsync(TranslateAppIdBox.Text, TranslateSecretBox.Password, CancellationToken.None);
-            SetTestStatus(TranslateTestStatus, "连接成功", true);
+            var settings = new AppSettings { OcrProvider = tencent ? "tencent" : "baidu" };
+            await new ApiClient().TestTranslateAsync(settings, TranslateAppIdBox.Text, TranslateSecretBox.Password, TencentSecretIdBox.Text, TencentSecretKeyBox.Password, CancellationToken.None);
+            SetTestStatus(status, "连接成功", true);
         }
         catch (Exception ex)
         {
-            SetTestStatus(TranslateTestStatus, "连接失败", false, true);
+            SetTestStatus(status, "连接失败", false, true);
             System.Windows.MessageBox.Show(this, ex.Message, "翻译连接测试", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-        finally { TestTranslateButton.IsEnabled = true; }
+        finally { TestTranslateButton.IsEnabled = true; TestTencentTranslateButton.IsEnabled = true; }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
