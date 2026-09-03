@@ -18,6 +18,9 @@ public sealed class ApiClient
     private const string OauthUrl = "https://aip.baidubce.com/oauth/2.0/token";
     private const string OcrBaseUrl = "https://aip.baidubce.com/rest/2.0/ocr/v1/";
     private const string TranslateUrl = "https://fanyi-api.baidu.com/api/trans/vip/translate";
+    private const string TencentTranslateHost = "tmt.tencentcloudapi.com";
+    private const string TencentTranslateService = "tmt";
+    private const string TencentTranslateVersion = "2018-03-21";
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(90) };
     private string? _cachedToken;
     private DateTime _tokenExpiresAt;
@@ -272,8 +275,10 @@ public sealed class ApiClient
                 foreach (var value in CollectWords(child)) yield return value;
     }
 
-    public async Task<string> TranslateAsync(string text, AppSettings settings, string appId, string secret, CancellationToken token)
+    public async Task<string> TranslateAsync(string text, AppSettings settings, string appId, string secret, string tencentSecretId, string tencentSecretKey, CancellationToken token)
     {
+        if (settings.OcrProvider == "tencent")
+            return await TranslateTencentAsync(text, settings.TargetLanguage, tencentSecretId, tencentSecretKey, token);
         if (string.IsNullOrWhiteSpace(appId) || string.IsNullOrWhiteSpace(secret))
             throw new InvalidOperationException("请先在设置中填写百度翻译的 APP ID 和密钥。");
 
@@ -285,6 +290,64 @@ public sealed class ApiClient
             translations.Add(await TranslateChunkAsync(chunks[i], settings.TargetLanguage, appId, secret, token));
         }
         return string.Join(Environment.NewLine, translations);
+    }
+
+    public Task<string> TranslateAsync(string text, AppSettings settings, string appId, string secret, CancellationToken token) =>
+        TranslateAsync(text, settings, appId, secret, "", "", token);
+
+    private async Task<string> TranslateTencentAsync(string text, string targetLanguage, string secretId, string secretKey, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(secretId) || string.IsNullOrWhiteSpace(secretKey))
+            throw new InvalidOperationException("请先在设置中填写腾讯云的 SecretId 和 SecretKey。");
+        var chunks = SplitByUtf8Bytes(text, 5000);
+        var translations = new List<string>();
+        for (var i = 0; i < chunks.Count; i++)
+        {
+            if (i > 0) await Task.Delay(120, token);
+            translations.Add(await TranslateTencentChunkAsync(chunks[i], targetLanguage, secretId.Trim(), secretKey.Trim(), token));
+        }
+        return string.Join(Environment.NewLine, translations);
+    }
+
+    private async Task<string> TranslateTencentChunkAsync(string text, string targetLanguage, string secretId, string secretKey, CancellationToken token)
+    {
+        var payload = JsonSerializer.Serialize(new { SourceText = text, Source = "auto", Target = ToTencentLanguage(targetLanguage), ProjectId = 0 });
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var date = DateTimeOffset.FromUnixTimeSeconds(timestamp).UtcDateTime.ToString("yyyy-MM-dd");
+        const string contentType = "application/json; charset=utf-8";
+        var hashedPayload = Sha256Hex(payload);
+        var canonicalHeaders = $"content-type:{contentType}\nhost:{TencentTranslateHost}\n";
+        const string signedHeaders = "content-type;host";
+        var canonicalRequest = $"POST\n/\n\n{canonicalHeaders}\n{signedHeaders}\n{hashedPayload}";
+        var credentialScope = $"{date}/{TencentTranslateService}/tc3_request";
+        var stringToSign = $"TC3-HMAC-SHA256\n{timestamp}\n{credentialScope}\n{Sha256Hex(canonicalRequest)}";
+        var secretDate = HmacSha256($"TC3{secretKey}", date);
+        var secretService = HmacSha256(secretDate, TencentTranslateService);
+        var secretSigning = HmacSha256(secretService, "tc3_request");
+        var signature = Convert.ToHexString(HmacSha256(secretSigning, stringToSign)).ToLowerInvariant();
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{TencentTranslateHost}/")
+        {
+            Content = new StringContent(payload, Encoding.UTF8, "application/json")
+        };
+        request.Headers.Host = TencentTranslateHost;
+        request.Headers.TryAddWithoutValidation("X-TC-Action", "TextTranslate");
+        request.Headers.TryAddWithoutValidation("X-TC-Version", TencentTranslateVersion);
+        request.Headers.TryAddWithoutValidation("X-TC-Timestamp", timestamp.ToString());
+        request.Headers.TryAddWithoutValidation("X-TC-Region", "ap-guangzhou");
+        request.Headers.TryAddWithoutValidation("Authorization", $"TC3-HMAC-SHA256 Credential={secretId}/{credentialScope}, SignedHeaders={signedHeaders}, Signature={signature}");
+        using var response = await _http.SendAsync(request, token);
+        var body = await response.Content.ReadAsStringAsync(token);
+        using var doc = JsonDocument.Parse(body);
+        if (doc.RootElement.TryGetProperty("Response", out var result))
+        {
+            if (result.TryGetProperty("Error", out var error))
+            {
+                var message = error.TryGetProperty("Message", out var errorMessage) ? errorMessage.GetString() : "腾讯云翻译请求失败";
+                throw new InvalidOperationException($"腾讯云翻译失败：{message}");
+            }
+            if (result.TryGetProperty("TargetText", out var target)) return target.GetString() ?? "";
+        }
+        throw new InvalidOperationException("腾讯云翻译返回了无法识别的响应。");
     }
 
     private async Task<string> TranslateChunkAsync(string text, string targetLanguage, string appId, string secret, CancellationToken token)
@@ -320,6 +383,12 @@ public sealed class ApiClient
             return;
         }
         _ = await GetAccessTokenAsync(apiKey.Trim(), secretKey.Trim(), token, true);
+    }
+
+    public async Task TestTranslateAsync(AppSettings settings, string appId, string secret, string tencentSecretId, string tencentSecretKey, CancellationToken token)
+    {
+        var testSettings = new AppSettings { OcrProvider = settings.OcrProvider, TargetLanguage = "英语" };
+        _ = await TranslateAsync("测试", testSettings, appId, secret, tencentSecretId, tencentSecretKey, token);
     }
 
     public async Task TestTranslateAsync(string appId, string secret, CancellationToken token)
@@ -376,6 +445,29 @@ public sealed class ApiClient
         }
         if (current.Length > 0) chunks.Add(current.ToString());
         return chunks.Count == 0 ? [""] : chunks;
+    }
+
+    private static string ToTencentLanguage(string language) => language switch
+    {
+        "英语" => "en",
+        "日语" => "ja",
+        "韩语" => "ko",
+        "法语" => "fr",
+        "德语" => "de",
+        "西班牙语" => "es",
+        "俄语" => "ru",
+        "繁体中文" => "zh-TW",
+        _ => "zh"
+    };
+
+    private static string Sha256Hex(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
+
+    private static byte[] HmacSha256(string key, string value) => HmacSha256(Encoding.UTF8.GetBytes(key), value);
+
+    private static byte[] HmacSha256(byte[] key, string value)
+    {
+        using var hmac = new HMACSHA256(key);
+        return hmac.ComputeHash(Encoding.UTF8.GetBytes(value));
     }
 
     private static string ToBaiduLanguage(string language) => language switch
