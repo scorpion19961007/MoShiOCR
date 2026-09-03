@@ -79,6 +79,8 @@ public partial class SettingsWindow : Window
         var tencent = provider.Tag?.ToString() == "tencent";
         var ocrMode = Settings.OcrMode;
         var tableMode = Settings.TableOcrMode;
+        BaiduOcrPanel.Visibility = tencent ? Visibility.Collapsed : Visibility.Visible;
+        TencentOcrPanel.Visibility = tencent ? Visibility.Visible : Visibility.Collapsed;
         OcrModeCombo.Items.Clear();
         TableOcrModeCombo.Items.Clear();
         if (tencent)
