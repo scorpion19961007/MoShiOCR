@@ -36,8 +36,6 @@ public partial class SettingsWindow : Window
         TencentSecretKeyBox.Password = CredentialStore.Read(CredentialStore.TencentSecretKey);
         TranslateAppIdBox.Text = CredentialStore.Read(CredentialStore.TranslateAppId);
         TranslateSecretBox.Password = CredentialStore.Read(CredentialStore.TranslateSecret);
-        OcrModeCombo.SelectedItem = OcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.OcrMode) ?? OcrModeCombo.Items[0];
-        TableOcrModeCombo.SelectedItem = TableOcrModeCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.TableOcrMode) ?? TableOcrModeCombo.Items[0];
         OcrProviderCombo.SelectedItem = OcrProviderCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Tag?.ToString() == Settings.OcrProvider) ?? OcrProviderCombo.Items[0];
         UpdateOcrModes();
         SetHotkeyBox(ScreenshotHotkeyBox, Settings.ScreenshotHotkey);
