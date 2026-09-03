@@ -82,6 +82,7 @@
                     <ComboBox x:Name="TableOcrModeCombo" Grid.Column="1"/>
                 </Grid>
 
+                <StackPanel x:Name="BaiduTranslatePanel">
                 <Border Background="{DynamicResource WarningSoftBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">
                     <TextBlock Text="百度翻译开放平台" FontWeight="SemiBold"/>
                 </Border>
@@ -96,6 +97,21 @@
                         <TextBlock x:Name="TranslateTestStatus" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
                     </StackPanel>
                 </Grid>
+                </StackPanel>
+
+                <StackPanel x:Name="TencentTranslatePanel" Visibility="Collapsed">
+                    <Border Background="{DynamicResource WarningSoftBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">
+                        <TextBlock Text="腾讯云翻译" FontWeight="SemiBold"/>
+                    </Border>
+                    <TextBlock Text="使用上方腾讯云 SecretId 和 SecretKey" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,12,0,0" TextWrapping="Wrap"/>
+                    <Grid Margin="0,12,0,0">
+                        <TextBlock Text="腾讯云 TMT 通用文本翻译，源语言自动检测" Foreground="{DynamicResource MutedBrush}" FontSize="10" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="TestTencentTranslateButton" Style="{StaticResource GhostButton}" Content="测试翻译" Click="TestTranslate_Click"/>
+                            <TextBlock x:Name="TencentTranslateTestStatus" VerticalAlignment="Center" Margin="9,0,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
 
                 <Border Background="{DynamicResource SectionBrush}" CornerRadius="5" Padding="12,9" Margin="0,22,0,0">
                     <TextBlock Text="全局快捷键" FontWeight="SemiBold"/>
