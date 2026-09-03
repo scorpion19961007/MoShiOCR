@@ -290,6 +290,8 @@ public partial class MainWindow : Window
                 _settings,
                 CredentialStore.Read(CredentialStore.TranslateAppId),
                 CredentialStore.Read(CredentialStore.TranslateSecret),
+                CredentialStore.Read(CredentialStore.TencentSecretId),
+                CredentialStore.Read(CredentialStore.TencentSecretKey),
                 token);
             AddHistory(SourceText.Text, TranslationText.Text);
             SetStatus("翻译完成");
@@ -519,7 +521,8 @@ public partial class MainWindow : Window
         var tableMode = _settings.OcrProvider == "tencent"
             ? (_settings.TableOcrMode == "table_v2" ? "表格 V2" : "表格 V1")
             : (_settings.TableOcrMode == "table_async" ? "表格提交请求" : "表格 V2");
-        ApiSummary.Text = $"{provider} OCR {ocrMode} · {tableMode} · 百度翻译";
+        var translationProvider = _settings.OcrProvider == "tencent" ? "腾讯云翻译" : "百度翻译";
+        ApiSummary.Text = $"{provider} OCR {ocrMode} · {tableMode} · {translationProvider}";
         var screenshot = DisplayHotkey(_settings.ScreenshotHotkey);
         var recognition = DisplayHotkey(_settings.RecognitionHotkey);
         var translation = DisplayHotkey(_settings.TranslationHotkey);
